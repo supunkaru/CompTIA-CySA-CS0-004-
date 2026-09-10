@@ -143,3 +143,26 @@ Focus areas will include:
 ---
 
 
+## Test Your Knowledge
+
+Before starting the detailed CySA+ learning journey, test your
+current knowledge with this interactive pre-assessment.
+
+### 🧠 CySA+ Knowledge Test
+
+**[▶ Try the CySA+ Knowledge Test](./Pre_Quiz.html)**
+
+This 20-question assessment provides:
+
+- Immediate feedback
+- Answer explanations
+- Score tracking
+- Progress tracking
+- Final score
+
+> This test is intended as a baseline assessment. I will retake it
+> later to measure my improvement throughout my CySA+ journey.
+
+---
+
+
