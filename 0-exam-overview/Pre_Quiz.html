@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CySA+ Readiness Pre-Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f8f9fa; }
+        .progress-bar { transition: width 0.3s ease; }
+        .option-btn { transition: all 0.2s ease; }
+        .option-btn:hover:not(:disabled) { background-color: #e2e8f0; }
+        .selected-correct { background-color: #d1fae5; border-color: #10b981; }
+        .selected-incorrect { background-color: #fee2e2; border-color: #ef4444; }
+        .actual-correct { background-color: #d1fae5; border-color: #10b981; }
+        .disabled-option { opacity: 0.7; cursor: not-allowed; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-10 px-4">
+
+    <div class="w-full max-w-3xl bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        
+        <!-- Header area -->
+        <div class="p-6 text-center border-b border-gray-100">
+            <h1 class="text-2xl font-serif text-gray-800 mb-2">CySA+ Readiness Pre-Assessment</h1>
+            <p class="text-gray-500 text-sm">20 questions · Shared quiz</p>
+        </div>
+
+        <!-- Progress and Score Bar -->
+        <div class="px-6 py-4 flex items-center justify-between bg-gray-50 border-b border-gray-100">
+            <div class="w-2/3 bg-gray-200 rounded-full h-1.5 mr-4 relative">
+                <div id="progress-fill" class="bg-gray-800 h-1.5 rounded-full progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center space-x-3 text-sm">
+                <span id="question-counter" class="text-gray-600 font-medium">1 / 20</span>
+                <span class="flex items-center bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span id="incorrect-score">0</span>
+                </span>
+                <span class="flex items-center bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span id="correct-score">0</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="p-6 md:p-8">
+            <!-- Question Content -->
+            <div id="question-text" class="text-lg text-gray-800 mb-8 font-medium"></div>
+
+            <!-- Options Container -->
+            <div id="options-container" class="space-y-3">
+                <!-- Options injected by JS -->
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="mt-8 flex justify-end">
+                <button id="next-btn" class="hidden bg-blue-400 hover:bg-blue-500 text-white font-medium py-2 px-6 rounded-full transition-colors">
+                    Next
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Container (Hidden initially) -->
+        <div id="results-container" class="hidden p-10 text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Quiz Complete!</h2>
+            <p class="text-xl text-gray-600 mb-8">You scored <span id="final-score" class="font-bold text-blue-600"></span> out of 20.</p>
+            <button id="restart-btn" class="bg-gray-800 hover:bg-gray-900 text-white font-medium py-3 px-8 rounded-full transition-colors">
+                Retake Quiz
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Cybersecurity analysts focus on protecting three key objectives of information systems. Which objective ensures that information and systems are ready to meet the needs of legitimate users at the time they request them?",
+                options: ["Confidentiality", "Integrity", "Availability", "Accountability"],
+                answer: 2,
+                explanation: "Availability ensures that information and systems are ready to meet the needs of legitimate users at the time those users request them."
+            },
+            {
+                question: "In the context of enterprise risk management, how is a cybersecurity \"risk\" formally defined?",
+                options: ["An outside force that may exploit a weakness.", "The intersection of a threat and a corresponding vulnerability.", "A weakness in a device, system, or application.", "The total attack surface of an organization."],
+                answer: 1,
+                explanation: "A risk exists only at the intersection of a threat and a vulnerability that the threat might exploit; if either is missing, there is no risk."
+            },
+            {
+                question: "Which threat analysis framework emphasizes the relationships and characteristics of four basic components: the adversary, capabilities, infrastructure, and victims?",
+                options: ["The Diamond Model of Intrusion Analysis", "MITRE ATT&CK", "The Cyber Kill Chain", "STRIDE"],
+                answer: 0,
+                explanation: "The Diamond Model of Intrusion Analysis focuses on understanding the attacker and uses the relationships between the adversary, capability, infrastructure, and victim to help analysts discover more information."
+            },
+            {
+                question: "What term describes an attack that exploits a previously unknown security vulnerability for which no patch is currently available?",
+                options: ["Fuzzing", "Zero-day attack", "Advanced Persistent Threat (APT)", "Credential stuffing"],
+                answer: 1,
+                explanation: "Zero-day attacks exploit vulnerabilities that are unknown to product vendors, meaning no patches are available to correct them."
+            },
+            {
+                question: "Which type of threat actor uses hacking as a means to achieve a political or philosophical end?",
+                options: ["Script kiddies", "Nation-state actors", "Organized crime", "Hacktivists"],
+                answer: 3,
+                explanation: "Hacktivists execute attacks for political or social reasons, which can include targeting governments and businesses."
+            },
+            {
+                question: "Threat intelligence is categorized into three levels. Which type is composed of highly detailed information allowing a response to a specific threat, such as how it spreads and how to remove it?",
+                options: ["Strategic intelligence", "Tactical intelligence", "Operational threat intelligence", "Open source intelligence"],
+                answer: 2,
+                explanation: "Operational threat intelligence includes highly detailed information used to respond to specific threats, including how the threat is delivered, what it attempts to do, and how to prevent it."
+            },
+            {
+                question: "An organization installs a firewall to block malicious traffic before it enters a network. What type of security control is this?",
+                options: ["Detective control", "Preventive control", "Corrective control", "Responsive control"],
+                answer: 1,
+                explanation: "Preventive controls, like firewalls and encryption, intend to stop a security issue before it actually occurs."
+            },
+            {
+                question: "When evaluating vulnerabilities using the Common Vulnerability Scoring System (CVSS), what is the highest possible base score a vulnerability can receive?",
+                options: ["5.0", "7.5", "10.0", "100"],
+                answer: 2,
+                explanation: "CVSS provides a publicly available framework that assigns a vulnerability a score from 0 to 10 indicating its severity."
+            },
+            {
+                question: "According to NIST, which of the following represents the correct four phases of the cybersecurity incident response process?",
+                options: ["Identification; Containment; Eradication; Recovery", "Preparation; Detection and Analysis; Containment, Eradication, and Recovery; Post-Incident Activity", "Reconnaissance; Weaponization; Delivery; Exploitation", "Discover; Identify; Remediate; Review"],
+                answer: 1,
+                explanation: "The four official phases outlined by NIST are Preparation; Detection and Analysis; Containment, Eradication, and Recovery; and Post-incident Activities."
+            },
+            {
+                question: "Which of the following threat actors is typically government-sponsored, often associated with Advanced Persistent Threats (APTs), and has the greatest access to resources?",
+                options: ["Insider threats", "Hacktivists", "Nation-state actors", "Organized crime"],
+                answer: 2,
+                explanation: "Nation-state actors have the resources of a country behind them, including tools, money, and talent, and often operate as APTs."
+            },
+            {
+                question: "In Lockheed Martin’s Cyber Kill Chain, which phase involves the creation of tools designed specifically to exploit a targeted vulnerability?",
+                options: ["Reconnaissance", "Delivery", "Weaponization", "Installation"],
+                answer: 2,
+                explanation: "The Weaponization phase of the Cyber Kill Chain involves the creation of tools specifically designed to exploit vulnerabilities."
+            },
+            {
+                question: "In the United States, what organizations were established under Presidential Decision Directive-63 to help critical infrastructure owners and operators share threat information?",
+                options: ["CISA", "SANS", "CERTs", "ISACs"],
+                answer: 3,
+                explanation: "Information Sharing and Analysis Centers (ISACs) were created to help infrastructure owners share threat and vulnerability information on a trust model."
+            },
+            {
+                question: "Microsoft created a classification model for threats. What does the \"S\" in the STRIDE model stand for?",
+                options: ["System compromise", "Spoofing of user identity", "Security evasion", "Subversion"],
+                answer: 1,
+                explanation: "In the STRIDE threat classification model, the \"S\" stands for Spoofing of user identity."
+            },
+            {
+                question: "When interpreting a CVSS version 3.1 score, what does the Privileges Required (PR) metric measure?",
+                options: ["The difficulty of exploiting the vulnerability.", "Whether the attacker requires physical access to the machine.", "The type of account access that an attacker must have to execute the attack.", "Whether action by a user other than the attacker is required."],
+                answer: 2,
+                explanation: "The Privileges Required (PR) metric contains information about the type of account access, such as basic user or administrative privileges, that an attacker must possess."
+            },
+            {
+                question: "What is the distinction between a security \"event\" and a security \"incident\"?",
+                options: ["An event causes damage; an incident is a false alarm.", "An event is an observable occurrence; an incident is a violation or imminent threat of violation of security policies.", "An incident is tracked by a SIEM; an event is investigated by a human.", "There is no distinction; the terms are used interchangeably."],
+                answer: 1,
+                explanation: "Every incident consists of one or more events, but an incident specifically involves a violation or imminent threat to an organization's computer security policies or standard practices."
+            },
+            {
+                question: "Which dynamic software security testing technique involves sending artificially generated or malformed input to an application to see how it responds?",
+                options: ["Static code analysis", "Debugging", "Fuzzing", "Reverse engineering"],
+                answer: 2,
+                explanation: "Fuzzing is a common dynamic testing technique where artificially generated input is sent to an application to identify potential flaws or crashes."
+            },
+            {
+                question: "When implementing network security monitoring, what technique relies on gathering data during normal network operations to trigger alerts when behaviors deviate from that standard?",
+                options: ["Signature matching", "Heuristics", "Device fingerprinting", "Baselining (anomaly-based detection)"],
+                answer: 3,
+                explanation: "Baselining requires knowledge of normal traffic; monitoring systems can then be set to alarm when network behavior deviates from the documented normal behaviors."
+            },
+            {
+                question: "If an organization must make an exception to a security policy, what type of control is implemented to mitigate the newly introduced risk?",
+                options: ["Preventive control", "Compensating control", "Corrective control", "Detective control"],
+                answer: 1,
+                explanation: "Compensating controls are specifically designed to mitigate the risk associated with exceptions made to a security policy."
+            },
+            {
+                question: "You are investigating a vulnerability that requires an attacker to be connected to the local network that the affected system resides on. What CVSS Attack Vector (AV) rating does this describe?",
+                options: ["Physical (P)", "Local (L)", "Adjacent Network (A)", "Network (N)"],
+                answer: 2,
+                explanation: "The Adjacent Network (A) attack vector describes a scenario where the attacker must have access to the local network that the affected system is connected to."
+            },
+            {
+                question: "Which of the following sets of tools are widely classified as infrastructure vulnerability scanners?",
+                options: ["Snort, Zeek, Suricata", "Nessus, OpenVAS, Qualys", "Autopsy, FTK, EnCase", "Burp Suite, OWASP ZAP, Nikto"],
+                answer: 1,
+                explanation: "Nessus, OpenVAS, and Qualys are commonly used tools that function as infrastructure vulnerability scanners."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let incorrectScore = 0;
+        let hasAnswered = false;
+
+        const letters = ['A', 'B', 'C', 'D'];
+
+        // DOM Elements
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextBtn = document.getElementById('next-btn');
+        const progressFill = document.getElementById('progress-fill');
+        const questionCounter = document.getElementById('question-counter');
+        const correctScoreEl = document.getElementById('correct-score');
+        const incorrectScoreEl = document.getElementById('incorrect-score');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+
+        function loadQuestion() {
+            hasAnswered = false;
+            nextBtn.classList.add('hidden');
+            
+            const q = quizData[currentQuestion];
+            questionText.textContent = `${currentQuestion + 1}. ${q.question}`;
+            
+            // Update UI trackers
+            questionCounter.textContent = `${currentQuestion + 1} / ${quizData.length}`;
+            progressFill.style.width = `${((currentQuestion) / quizData.length) * 100}%`;
+            
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-xl border border-gray-200 bg-gray-50 flex flex-col focus:outline-none';
+                btn.onclick = () => selectOption(index, btn);
+                
+                // Option Header (Letter + Text)
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'flex items-start w-full';
+                
+                const letterSpan = document.createElement('span');
+                letterSpan.className = 'font-bold mr-3 text-gray-800';
+                letterSpan.textContent = `${letters[index]}.`;
+                
+                const textSpan = document.createElement('span');
+                textSpan.className = 'text-gray-700';
+                textSpan.textContent = option;
+                
+                // Status Badge (Hidden initially)
+                const badgeSpan = document.createElement('span');
+                badgeSpan.className = 'ml-auto text-xs px-2 py-1 rounded-full hidden flex-shrink-0';
+                badgeSpan.id = `badge-${index}`;
+                
+                headerDiv.appendChild(letterSpan);
+                headerDiv.appendChild(textSpan);
+                headerDiv.appendChild(badgeSpan);
+                
+                // Explanation Area (Hidden initially)
+                const expDiv = document.createElement('div');
+                expDiv.className = 'mt-3 text-sm text-gray-600 hidden pl-7';
+                expDiv.id = `exp-${index}`;
+                
+                btn.appendChild(headerDiv);
+                btn.appendChild(expDiv);
+                
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedIndex, selectedBtn) {
+            if (hasAnswered) return;
+            hasAnswered = true;
+            
+            const q = quizData[currentQuestion];
+            const isCorrect = selectedIndex === q.answer;
+            const allBtns = optionsContainer.querySelectorAll('.option-btn');
+            
+            // Disable all buttons
+            allBtns.forEach((btn, idx) => {
+                btn.classList.add('disabled-option');
+                btn.onclick = null;
+                
+                // Show explanation on the correct answer and the selected answer
+                if(idx === q.answer || idx === selectedIndex) {
+                    const expDiv = btn.querySelector(`#exp-${idx}`);
+                    if(expDiv) {
+                        expDiv.textContent = q.explanation;
+                        expDiv.classList.remove('hidden');
+                    }
+                }
+            });
+            
+            // Handle Selected Styling
+            selectedBtn.classList.remove('bg-gray-50', 'border-gray-200', 'disabled-option');
+            const selectedBadge = selectedBtn.querySelector(`#badge-${selectedIndex}`);
+            selectedBadge.classList.remove('hidden');
+            
+            if (isCorrect) {
+                selectedBtn.classList.add('selected-correct');
+                selectedBadge.textContent = '✓ Correct answer';
+                selectedBadge.classList.add('bg-green-200', 'text-green-800');
+                score++;
+                correctScoreEl.textContent = score;
+            } else {
+                selectedBtn.classList.add('selected-incorrect');
+                selectedBadge.innerHTML = '✕ Incorrect';
+                selectedBadge.classList.add('bg-red-200', 'text-red-800');
+                incorrectScore++;
+                incorrectScoreEl.textContent = incorrectScore;
+                
+                // Highlight the actual correct answer if user got it wrong
+                const correctBtn = allBtns[q.answer];
+                correctBtn.classList.remove('bg-gray-50', 'border-gray-200', 'disabled-option');
+                correctBtn.classList.add('actual-correct');
+            }
+            
+            // Update progress bar to include current question
+            progressFill.style.width = `${((currentQuestion + 1) / quizData.length) * 100}%`;
+            nextBtn.classList.remove('hidden');
+        }
+
+        nextBtn.addEventListener('click', () => {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            finalScoreEl.textContent = score;
+        }
+        
+        restartBtn.addEventListener('click', () => {
+            currentQuestion = 0;
+            score = 0;
+            incorrectScore = 0;
+            correctScoreEl.textContent = score;
+            incorrectScoreEl.textContent = incorrectScore;
+            quizContainer.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            loadQuestion();
+        });
+
+        // Initialize first question
+        loadQuestion();
+    </script>
+</body>
+</html>
