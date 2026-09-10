@@ -73,3 +73,73 @@ the CompTIA CySA+ certification.
 ---
 
 **Learning → Practising → Investigating → Documenting → Improving**
+
+
+---
+
+## Exam Domain Breakdown
+
+| Domain | Area | Weight | Status |
+|---|---|---:|---|
+| **Domain 1** | Security Operations | **34%** | 🔄 In Progress |
+| **Domain 2** | Vulnerability Management | **26%** | ⏳ Not Started |
+| **Domain 3** | Incident Response and Management | **24%** | ⏳ Not Started |
+| **Domain 4** | Reporting and Communication | **16%** | ⏳ Not Started |
+| | **Total** | **100%** | |
+
+### Domain 1 — Security Operations
+**34%**
+
+Focus areas will include:
+
+- Security monitoring
+- Threat detection
+- Security analytics
+- Log analysis
+- SIEM
+- Indicators of Compromise (IOCs)
+- Threat intelligence
+- Threat hunting
+- Security tools and technologies
+
+### Domain 2 — Vulnerability Management
+**26%**
+
+Focus areas will include:
+
+- Vulnerability identification
+- Vulnerability scanning
+- Vulnerability assessment
+- Risk prioritisation
+- Remediation
+- Security controls
+
+### Domain 3 — Incident Response and Management
+**24%**
+
+Focus areas will include:
+
+- Incident detection
+- Incident analysis
+- Incident response
+- Containment
+- Eradication
+- Recovery
+- Evidence handling
+- Post-incident activities
+
+### Domain 4 — Reporting and Communication
+**16%**
+
+Focus areas will include:
+
+- Security reporting
+- Incident reporting
+- Vulnerability reporting
+- Risk communication
+- Security metrics
+- Stakeholder communication
+
+---
+
+
