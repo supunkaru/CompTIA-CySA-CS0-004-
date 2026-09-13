@@ -160,9 +160,7 @@ This 20-question assessment provides:
 - Progress tracking
 - Final score
 
-> This test is intended as a baseline assessment. I will retake it
-> later to measure my improvement throughout my CySA+ journey.
-
+> This test is intended as a baseline assessment. 
 ---
 
 
