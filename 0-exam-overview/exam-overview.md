@@ -150,7 +150,7 @@ current knowledge with this interactive pre-assessment.
 
 ### 🧠 CySA+ Knowledge Test
 
-**[▶ Try the CySA+ Knowledge Test](./Pre_Quiz.html)**
+**[▶ Try the CySA+ Knowledge Test](https://supunkaru.github.io/CompTIA-CySA-CS0-004-/0-exam-overview/Pre_Quiz.html)**
 
 This 20-question assessment provides:
 
